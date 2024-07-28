@@ -4,19 +4,18 @@ include('../config.php');
 if(empty($_SESSION['username'])){
     header("location:../index.php");
 }
-
 $last = $_SESSION['username'];
 $sqlupdate = "UPDATE users SET last_activity=now() WHERE username='$last'";
-$queryupdate = mysqli_query($koneksi, $sqlupdate);
+$queryupdate = mysqli_query($koneksi,$sqlupdate);
 
 $user = $_SESSION['username'];
-$query = mysqli_query($koneksi, "SELECT fullname, job_title, last_activity FROM users WHERE username='$user'");
+$query = mysqli_query($koneksi,"SELECT fullname,job_title,last_activity FROM users WHERE username='$user'");
 $data = mysqli_fetch_array($query);
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Selamat datang, <?php echo $data['fullname']; ?> - Aplikasi Enkripsi dan Dekripsi AES-128</title>
+    <title><?php echo $data['fullname']; ?> - Enkripsi AES-128</title>
     <link rel="shortcut icon" href="../assets/images/lockandkey2.png">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -24,8 +23,8 @@ $data = mysqli_fetch_array($query);
     <link rel="stylesheet" type="text/css" href="../assets/css/main.css">
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries-->
     <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src='https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js'></script>
+    <script src='https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js'></script>
     <![endif]-->
 </head>
 <body class="sidebar-mini fixed">
@@ -63,11 +62,11 @@ $data = mysqli_fetch_array($query);
                     </div>
                 </div>
                 <ul class="sidebar-menu">
-                    <li><a href="index.php" style="border-color:#fff; background-color: #778899;">
-                        <i class="fa fa-home"></i><span>Dashboard</span>
-                    </a></li>
+                    <li><a href="index.php"><i class="fa fa-home"></i><span>Dashboard</span></a></li>
                     <li class="treeview">
-                        <a href="#"><i class="fa fa-file-o"></i><span>File</span><i class="fa fa-angle-right"></i></a>
+                        <a href="#" style="border-color:#fff;background-color: #778899;">
+                            <i class="fa fa-file-o"></i><span>File</span><i class="fa fa-angle-right"></i>
+                        </a>
                         <ul class="treeview-menu">
                             <li><a href="encrypt.php"><i class="fa fa-circle-o"></i> Enkripsi</a></li>
                             <li><a href="decrypt.php"><i class="fa fa-circle-o"></i> Dekripsi</a></li>
@@ -85,13 +84,14 @@ $data = mysqli_fetch_array($query);
             <div class="page-title">
                 <div>
                     <h1 style="color: #2F4F4F;">
-                        <i class='fa fa-home' style="color: #2F4F4F"></i> Dashboard
+                        <i class="fa fa-file" style="color: #2F4F4F;"></i> Form Enkripsi Dokumen
                     </h1>
                 </div>
                 <div>
                     <ul class="breadcrumb">
                         <li><i class="fa fa-home fa-lg"></i></li>
-                        <li><a href="#" style="color: #2196F3">Dashboard</a></li>
+                        <li><a href="index.php" style="color: #2196F3;">Dashboard</a></li>
+                        <li>Form Enkripsi</li>
                     </ul>
                 </div>
             </div>
@@ -99,50 +99,49 @@ $data = mysqli_fetch_array($query);
                 <div class="col-md-12">
                     <div class="card">
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="widget-small info"><i class="icon fa fa-users fa-3x"></i>
-                                        <?php
-                                        $query = mysqli_query($koneksi, "SELECT * FROM users");
-                                        $datauser = mysqli_num_rows($query);
-                                        ?>
-                                        <div class="info">
-                                            <h4>Pengguna</h4>
-                                            <p><b><?php echo $datauser; ?></b></p>
+                            <form class="form-horizontal" method="post" action="encrypt-process.php" enctype="multipart/form-data">
+                                <fieldset>
+                                    <legend>Form Enkripsi</legend>
+                                    <div class="form-group">
+                                        <label class="col-lg-2 control-label" for="inputTgl">Tanggal</label>
+                                        <div class="col-lg-4">
+                                            <input class="form-control" id="inputTgl" type="text" placeholder="Tanggal" name="datenow" value="<?php echo date("Y-m-d"); ?>" readonly>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="widget-small info"><i class="icon fa fa-briefcase fa-3x"></i>
-                                        <?php
-                                        $query = mysqli_query($koneksi, "SELECT * FROM file WHERE status='1'");
-                                        $dataencrypt = mysqli_num_rows($query);
-                                        ?>
-                                        <div class="info">
-                                            <h4>Enkripsi</h4>
-                                            <p><b><?php echo $dataencrypt; ?></b></p>
+                                    <div class="form-group">
+                                        <label class="col-lg-2 control-label" for="inputFile">File</label>
+                                        <div class="col-lg-4">
+                                            <input class="form-control" id="inputFile" type="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" required>
+                                            <p style="margin-bottom: 0px; margin-top: 5px; font-size: 1rem;">
+                                                <i>Allowed PDF, MS Office (Word, Excel, PowerPoint) or txt.</i>
+                                            </p>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="widget-small info"><i class="icon fa fa-files-o fa-3x"></i>
-                                        <?php
-                                        $query = mysqli_query($koneksi, "SELECT * FROM file WHERE status='2'");
-                                        $datadecrypt = mysqli_num_rows($query);
-                                        ?>
-                                        <div class="info">
-                                            <h4>Dekripsi</h4>
-                                            <p><b><?php echo $datadecrypt; ?></b></p>
+                                    <div class="form-group">
+                                        <label class="col-lg-2 control-label" for="inputPassword">Kunci</label>
+                                        <div class="col-lg-4">
+                                            <input class="form-control" id="inputPassword" type="password" placeholder="Kunci" name="pwdfile" required>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                    <div class="form-group">
+                                        <label class="col-lg-2 control-label" for="textArea">Deskripsi File</label>
+                                        <div class="col-lg-4">
+                                            <textarea class="form-control" id="textArea" rows="3" name="desc" placeholder="Deskripsi"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-lg-2 control-label" for="textArea"></label>
+                                        <div class="col-lg-2">
+                                            <input type="submit" style="background-color:#2196F3;" name="encrypt_now" value="Enkripsi File" class="form-control btn btn-primary">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <footer></footer>
     </div>
     <script src="../assets/js/jquery-2.1.4.min.js"></script>
     <script src="../assets/js/essential-plugins.js"></script>
